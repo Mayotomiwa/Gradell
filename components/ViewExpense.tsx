@@ -2,7 +2,7 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import React from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { UNCATEGORIZED_BUDGET_ID, useBudgets } from '@/context/AppContext';
+import { useBudgets } from '@/context/AppContext';
 import { currencyFormatter } from '@/utils/curencyFormatter';
 import Colors from '../constants/Colors';
 
@@ -14,10 +14,10 @@ interface ViewExpensesProps {
 const ViewExpenses: React.FC<ViewExpensesProps> = ({ budgetId, handleClose }) => {
     const { getBudgetExpenses, budgets, deleteBudget, deleteExpense } = useBudgets();
 
-    const budget = UNCATEGORIZED_BUDGET_ID === budgetId
-        ? { name: "Uncategorized", id: UNCATEGORIZED_BUDGET_ID }
-        : budgets.find(b => b.id === budgetId);
+    // Find the budget matching the budgetId or return undefined if not found
+    const budget = budgets.find(b => b.id === budgetId);
 
+    // Get the expenses for the given budgetId
     const expenses = getBudgetExpenses(budgetId || '');
 
     return (
@@ -30,15 +30,13 @@ const ViewExpenses: React.FC<ViewExpensesProps> = ({ budgetId, handleClose }) =>
                 <ScrollView contentContainerStyle={styles.scrollView}>
                     <View style={styles.headerContainer}>
                         <Text style={styles.header}>
-                            Expense - {budget?.name}
+                            Expense - {budget?.name ?? "Unknown Budget"}
                         </Text>
-                        {budgetId !== UNCATEGORIZED_BUDGET_ID && (
+                        {budget && (
                             <TouchableOpacity
                                 style={styles.deleteButton}
                                 onPress={() => {
-                                    if (budget) {
-                                        deleteBudget(budget);
-                                    }
+                                    deleteBudget(budget);
                                     handleClose();
                                 }}
                             >
